@@ -19,7 +19,7 @@ window.CONFIG = {
   // "auto: true" = otomatis kebuka jam 00:00 walau belum kamu OK-in.
   steps: [
     { icon: "🚗", title: "Jemputanmu datang",
-      teaser: "Siap-siap ya cantik, sebentar lagi ada yang jemput kamu.",
+      teaser: "Coba tebak ini apaaa",
       desc: "Driver sudah dalam perjalanan. Kamu tinggal duduk manis — dan jangan tanya mau ke mana ya 🤫" },
     { icon: "📍", title: "Sampai di tempat rahasia",
       teaser: "Perjalanan menuju tempat yang sudah aku siapkan…",
