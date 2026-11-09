@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Untuk Matahari ☀️</title>
+<title>Haii Matahari ☀️</title>
 <meta name="theme-color" content="#070a1c">
-<meta property="og:title" content="Untuk Matahari ☀️">
-<meta property="og:description" content="Ada sesuatu buat kamu. Buka ya.">
+<meta property="og:title" content="Haii Matahari ☀️">
+<meta property="og:description" content="Ini buat Matahari kesayangan naynayyy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Great+Vibes&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -24,14 +24,14 @@
   <div class="kicker">Untuk</div>
   <h1 id="introName">Matahari</h1>
   <div class="sunwrap"><div class="sunclip"><div class="isun" id="isun" role="button" aria-label="Ketuk matahari"></div></div></div>
-  <div class="line" id="introLine">Ada sesuatu yang sudah aku siapkan.</div>
-  <div class="tap" id="introTap">Ketuk mataharinya</div>
+  <div class="line" id="introLine">Halo Matahari Kesayangan Naynayyy.</div>
+  <div class="tap" id="introTap">diKlik mataharinya dong</div>
 </section>
 
 <!-- MAIN -->
 <main id="main">
   <header class="hero">
-    <div class="kicker" id="heroKicker">Malam ini, untuk Matahari</div>
+    <div class="kicker" id="heroKicker">Semoga pacarkuu sukaaa</div>
     <h1 id="heroTitle">Matahari terbit lagi dalam</h1>
     <div id="cdWrap">
       <div class="cd"><b id="cdH">00</b><i>:</i><b id="cdM">00</b><i>:</i><b id="cdS">00</b></div>
@@ -49,20 +49,20 @@
   <section class="card moment" id="moment"></section>
 
   <section class="card" id="driverCard" style="display:none">
-    <div class="lbl">Jemputanmu</div>
-    <h2>Tujuannya rahasia</h2>
+    <div class="lbl">Siap-Siap untuk dijemput ya!</div>
+    <h2>Tujuannya rahasia heheh</h2>
     <div id="driverRows" style="margin-top:8px"></div>
     <div id="driverLink"></div>
   </section>
 
   <section class="card" id="noteCard" style="display:none">
-    <div class="lbl">Pesan dariku</div>
+    <div class="lbl">Pesan dari Naynayy</div>
     <div class="note" id="noteText"></div>
   </section>
 
   <section class="card" id="surpriseCard"></section>
 
-  <div class="footer">Ketuk bintangnya untuk melihat tiap momen</div>
+  <div class="footer">Ketuk bintangnya deh kalau penasaran</div>
 </main>
 
 <!-- SUNRISE -->
@@ -73,9 +73,9 @@
     <div class="k" id="srDate">11 · 11</div>
     <h1>Selamat ulang tahun,</h1>
     <div class="nm" id="srName">Matahari</div>
-    <div class="q">Di tengah malam pun, matahariku tetap terbit.</div>
+    <div class="q">Senyum dong pacarku, mana senyumnya yang manis ituuu.</div>
   </div>
-  <div class="sr-btn" id="srBtn"><button class="btn" id="toLetter">Buka suratku</button></div>
+  <div class="sr-btn" id="srBtn"><button class="btn" id="toLetter">Surat dari Naynayy</button></div>
 </section>
 
 <!-- LETTER -->
@@ -92,10 +92,10 @@
   <button class="x" data-close="cakeOv" aria-label="Tutup">×</button>
   <div class="inner">
     <div class="ov-title" id="cakeTitle">Make a wish</div>
-    <div class="ov-sub" id="cakeSub">Pejamkan mata, buat permohonan, lalu tiup lilinnya.</div>
+    <div class="ov-sub" id="cakeSub">Tutup Mata, make a wish terus tiup lilinnya berbarengan.</div>
     <div class="cake"><div class="plate-c"></div><div class="tier b"></div><div class="tier t"></div><div class="candles" id="candles"></div></div>
     <div class="mic-meter" id="micMeter"><i></i></div>
-    <div class="hint" id="cakeHint">Tiup ke mic HP-mu, atau ketuk lilinnya satu per satu.</div>
+    <div class="hint" id="cakeHint">nyalain micnya biar lilin digitalnya juga ikut ketiup.</div>
     <div class="btn-col" id="cakeBtns"><button class="btn ghost" id="micBtn">Tiup lewat mic</button></div>
     <div class="after" id="cakeAfter"><button class="btn" id="toGift">Buka kado</button></div>
   </div>
@@ -105,8 +105,8 @@
 <section class="overlay" id="giftOv">
   <button class="x" data-close="giftOv" aria-label="Tutup">×</button>
   <div class="inner">
-    <div class="ov-title">Untukmu</div>
-    <div class="ov-sub" id="giftSub">Ketuk kadonya tiga kali.</div>
+    <div class="ov-title">tuk pacarku</div>
+    <div class="ov-sub" id="giftSub">coba ketuk tigakali.</div>
     <div class="gift" id="gift"><div class="lid"><div class="bow"></div></div><div class="box"></div></div>
     <div class="gift-card" id="giftCard"><p id="giftMsg"></p></div>
     <div class="after" id="giftAfter"><button class="btn ghost" data-close="giftOv">Kembali</button></div>
@@ -307,7 +307,7 @@ function renderMoment(anim){
 function render(){
   renderStars(); renderMoment(false);
   const dr=status.driver||{};
-  const rows=[['Driver',esc(dr.name)],['Mobil',esc(dr.car)],['Plat',dr.plate&&`<span class="plate">${esc(dr.plate)}</span>`]].filter(r=>r[1]);
+  const rows=[['Driver',esc(dr.name)],['Mobil/Motor',esc(dr.car)],['Plat',dr.plate&&`<span class="plate">${esc(dr.plate)}</span>`]].filter(r=>r[1]);
   if(rows.length||dr.link){ $('driverCard').style.display='';
     $('driverRows').innerHTML=rows.map(r=>`<div class="row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('');
     $('driverLink').innerHTML=dr.link?`<div class="btn-col"><a class="btn ghost sm" style="text-align:center;text-decoration:none" href="${esc(dr.link)}" target="_blank" rel="noopener">Lacak perjalanan</a></div>`:'';
