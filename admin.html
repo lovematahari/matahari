@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Panel Rahasia</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Jost',system-ui,sans-serif;background:#faf7f4;color:#3b3234;padding:20px 16px 60px}
+.wrap{max-width:480px;margin:0 auto}
+h1{font-family:'Cormorant Garamond',serif;font-size:30px;color:#3b3234}
+.sub{font-size:13px;color:#8b807d;margin-top:2px}
+.card{background:#fff;border-radius:20px;padding:18px;margin-top:16px;box-shadow:0 14px 30px -20px rgba(59,50,52,.25)}
+.card h2{font-size:15px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#b88a7e;margin-bottom:10px}
+label{display:block;font-size:12px;color:#8b807d;margin:10px 0 4px}
+input,textarea{width:100%;font:inherit;font-size:15px;padding:11px 12px;border-radius:12px;border:1px solid #ece4de;background:#ffffff;color:#3b3234}
+textarea{min-height:80px;resize:vertical}
+.btn{border:0;cursor:pointer;font:inherit;font-weight:500;font-size:14px;padding:13px 18px;border-radius:999px;color:#fff;width:100%;margin-top:14px;
+  background:#3b3234}
+.btn.ghost{background:#fff;color:#b88a7e;box-shadow:inset 0 0 0 1px #ece4de}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.steps{list-style:none}
+.steps li{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;margin-top:8px;cursor:pointer;border:1px solid #ece4de;background:#ffffff;transition:.2s}
+.steps li .ic{font-size:20px;width:30px;text-align:center}
+.steps li .tt{flex:1;font-size:15px}
+.steps li .st{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#b9aeaa}
+.steps li.done{background:#f3e9e4;border-color:#ece4de}
+.steps li.done .st{color:#b88a7e}
+.steps li.now{background:#3b3234;color:#fff;border-color:transparent}
+.steps li.now .st{color:#fff}
+.steps li.busy{opacity:.5;pointer-events:none}
+#log{font-size:13px;margin-top:12px;min-height:18px;color:#8b807d}
+#log.err{color:#c0392b}
+.tip{font-size:12.5px;color:#8b807d;line-height:1.5;margin-top:10px}
+a{color:#b88a7e}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Panel Rahasia 🤫</h1>
+  <div class="sub">Ketuk momen yang sedang berlangsung — HP dia ikut update dalam ±1 menit.</div>
+
+  <section class="card" id="setup">
+    <h2>Hubungkan ke GitHub</h2>
+    <div class="row">
+      <div><label>Username GitHub</label><input id="owner" autocomplete="off" autocapitalize="off"></div>
+      <div><label>Nama repo</label><input id="repo" autocomplete="off" autocapitalize="off"></div>
+    </div>
+    <label>Branch</label><input id="branch" value="main" autocapitalize="off">
+    <label>Token (fine-grained, akses Contents: Read & write)</label><input id="token" type="password" autocomplete="off">
+    <button class="btn" id="connect">Hubungkan</button>
+    <div class="tip">Token cuma disimpan di browser HP kamu ini, nggak ikut ke-upload ke mana-mana.</div>
+  </section>
+
+  <div id="panel" hidden>
+    <section class="card">
+      <h2>Rundown</h2>
+      <ul class="steps" id="steps"></ul>
+      <div class="row">
+        <button class="btn ghost" id="back">◀ Mundur</button>
+        <button class="btn" id="next">Lanjut ▶</button>
+      </div>
+      <div id="log"></div>
+    </section>
+
+    <section class="card">
+      <h2>Info driver</h2>
+      <div class="row">
+        <div><label>Nama driver</label><input id="dName"></div>
+        <div><label>Plat nomor</label><input id="dPlate"></div>
+      </div>
+      <label>Mobil</label><input id="dCar" placeholder="Toyota Avanza Putih">
+      <label>Link lacak (opsional)</label><input id="dLink" placeholder="https://...">
+      <div class="tip">⚠️ Link "share trip" Grab/Gojek biasanya menampilkan tujuan. Kosongkan kalau mau tetap rahasia.</div>
+      <label>Pesan singkat untuk dia (opsional)</label>
+      <textarea id="note" placeholder="Aku udah nunggu kamu di sini 💗"></textarea>
+      <button class="btn" id="saveInfo">Simpan info & pesan</button>
+    </section>
+
+    <section class="card">
+      <h2>Lainnya</h2>
+      <a href="index.html?test" target="_blank">Buka mode tes halaman dia ↗</a>
+      <button class="btn ghost" id="logout">Lupakan token di HP ini</button>
+    </section>
+  </div>
+</div>
+
+<script>
+const C = window.CONFIG, $ = id => document.getElementById(id);
+let cfg = {}, sha = null, state = { step:0, driver:{}, note:'' };
+try{ cfg = JSON.parse(localStorage.getItem('bd_admin')||'{}'); }catch(e){}
+['owner','repo','branch','token'].forEach(k=>{ if(cfg[k]) $(k).value=cfg[k]; });
+
+const b64e = s => btoa(unescape(encodeURIComponent(s)));
+const b64d = s => decodeURIComponent(escape(atob(s.replace(/\n/g,''))));
+function log(msg, err){ $('log').textContent=msg; $('log').className=err?'err':''; }
+
+function api(method, body){
+  const url = `https://api.github.com/repos/${cfg.owner}/${cfg.repo}/contents/status.json` + (method==='GET' ? `?ref=${encodeURIComponent(cfg.branch)}&t=${Date.now()}` : '');
+  return fetch(url, { method, cache:'no-store',
+    headers:{ Authorization:'Bearer '+cfg.token, Accept:'application/vnd.github+json', 'Content-Type':'application/json' },
+    body: body ? JSON.stringify(body) : undefined });
+}
+async function load(){
+  const r = await api('GET');
+  if(!r.ok){ const t = r.status===404 ? 'status.json / repo nggak ketemu' : r.status===401 ? 'Token salah / kadaluarsa' : 'Error '+r.status; throw new Error(t); }
+  const j = await r.json(); sha = j.sha;
+  state = Object.assign({ step:0, driver:{}, note:'' }, JSON.parse(b64d(j.content)));
+}
+async function save(label, retried){
+  const r = await api('PUT', { message: label, content: b64e(JSON.stringify(state,null,2)+'\n'), sha, branch: cfg.branch });
+  if((r.status===409 || r.status===422) && !retried){ const keep = {...state}; await load(); state = keep; return save(label, true); }
+  if(!r.ok) throw new Error('Gagal simpan (error '+r.status+')');
+  sha = (await r.json()).content.sha;
+}
+
+function render(){
+  $('steps').innerHTML = C.steps.map((s,i)=>{
+    const cls = i < state.step-1 ? 'done' : i === state.step-1 ? 'now' : '';
+    const st = cls==='done' ? 'selesai' : cls==='now' ? 'sekarang' : (s.auto ? 'auto 00:00' : '');
+    return `<li class="${cls}" data-i="${i}"><span class="ic">${s.icon}</span><span class="tt">${s.title}</span><span class="st">${st}</span></li>`;
+  }).join('');
+  const d = state.driver||{};
+  $('dName').value=d.name||''; $('dPlate').value=d.plate||''; $('dCar').value=d.car||''; $('dLink').value=d.link||''; $('note').value=state.note||'';
+}
+async function setStep(n){
+  n = Math.max(0, Math.min(C.steps.length, n));
+  const prev = state.step; state.step = n;
+  document.querySelectorAll('.steps li').forEach(li=>li.classList.add('busy'));
+  log('Mengirim…');
+  try{ await save('step '+n+(n?': '+C.steps[n-1].title:'')); render(); log('✓ Terkirim: '+(n? C.steps[n-1].title : 'belum mulai')+'. Muncul di HP dia ±1 menit.'); }
+  catch(e){ state.step = prev; render(); log(e.message, true); }
+}
+
+$('connect').onclick = async ()=>{
+  cfg = { owner:$('owner').value.trim(), repo:$('repo').value.trim(), branch:$('branch').value.trim()||'main', token:$('token').value.trim() };
+  $('connect').textContent='Menghubungkan…';
+  try{
+    await load();
+    localStorage.setItem('bd_admin', JSON.stringify(cfg));
+    $('setup').hidden = true; $('panel').hidden = false; render(); log('Terhubung ✓');
+  }catch(e){ alert(e.message); }
+  $('connect').textContent='Hubungkan';
+};
+$('steps').onclick = e => { const li=e.target.closest('li'); if(!li) return; const i=+li.dataset.i; setStep(state.step===i+1 ? i : i+1); };
+$('next').onclick = ()=>setStep(state.step+1);
+$('back').onclick = ()=>setStep(state.step-1);
+$('saveInfo').onclick = async ()=>{
+  state.driver = { name:$('dName').value.trim(), plate:$('dPlate').value.trim(), car:$('dCar').value.trim(), link:$('dLink').value.trim() };
+  state.note = $('note').value.trim();
+  $('saveInfo').textContent='Menyimpan…';
+  try{ await save('update info'); log('✓ Info & pesan tersimpan.'); }catch(e){ log(e.message, true); }
+  $('saveInfo').textContent='Simpan info & pesan';
+};
+$('logout').onclick = ()=>{ localStorage.removeItem('bd_admin'); location.reload(); };
+
+if(cfg.owner && cfg.repo && cfg.token) $('connect').click();
+</script>
+</body>
+</html>
