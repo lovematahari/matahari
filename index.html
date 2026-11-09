@@ -294,13 +294,13 @@ function renderMoment(anim){
   let i = selected!=null ? selected : (eff>0 ? eff-1 : null);
   let html;
   if(i==null){
-    html=`<div class="lbl">Sebelum semuanya dimulai</div><h2>Bintang pertama belum menyala</h2><p>Tunggu kabar dariku ya. Begitu waktunya tiba, bintangnya akan menyala dengan sendirinya.</p>`;
+    html=`<div class="lbl">Sabar ya belum dimulai!</div><h2>Tracking Bintangnya masih belum bisa di klik :P</h2><p>Caball yaaa dudutt.</p>`;
   } else {
     const st=C.steps[i], s=stateOf(i,eff), num=`${pad(i+1)} / ${pad(N)}`;
     if(s==='done') html=`<div class="lbl">Momen ${num} · sudah dilewati</div><h2>${esc(st.title)}</h2><p>${esc(st.desc)}</p>`;
     else if(s==='now') html=`<div class="lbl">Momen ${num} · sekarang</div><h2>${esc(st.title)}</h2><p>${esc(st.desc)}</p>`;
     else if(s==='next') html=`<div class="lbl">Momen ${num} · berikutnya</div><h2>Masih rahasia</h2><p class="teaser">${esc(st.teaser)}</p>`;
-    else html=`<div class="lbl">Momen ${num}</div><h2>Belum waktunya</h2><p>Bintang ini masih menunggu gilirannya menyala.</p>`;
+    else html=`<div class="lbl">Momen ${num}</div><h2>Masih Rahasia</h2><p>Nanti bintangnya nyala kok</p>`;
   }
   if(anim){ m.classList.add('swap'); setTimeout(()=>{ m.innerHTML=html; m.classList.remove('swap'); },250); } else m.innerHTML=html;
 }
@@ -315,8 +315,8 @@ function render(){
   if(status.note){ $('noteCard').style.display=''; $('noteText').textContent=status.note; } else $('noteCard').style.display='none';
   const sc=$('surpriseCard');
   sc.innerHTML = !isBday()
-    ? `<div class="lbl">Tepat pukul 00:00</div><h2>Ada yang menunggu di tengah malam</h2><p>Biarkan halaman ini tetap terbuka. Saat waktunya tiba, kamu akan tahu.</p>`
-    : `<div class="lbl">Untukmu</div><h2>Sudah terbuka</h2><div class="btn-col"><button class="btn" data-open="letter">Baca suratku</button><button class="btn ghost" data-open="cake">Tiup lilin</button><button class="btn ghost" data-open="gift">Buka kado</button></div>`;
+    ? `<div class="lbl">Tepat pukul 00:00</div><h2>Pantau Terus Halaman ini yaaa</h2><p>Besok Malam Hari Selasa jam 23:50 Harus ada di page ini, harus dipantau ini buatan NayNay</p>`
+    : `<div class="lbl">Untukmu</div><h2>Sudah terbuka</h2><div class="btn-col"><button class="btn" data-open="letter">Surat Dari NayNay</button><button class="btn ghost" data-open="cake">Tiup lilin</button><button class="btn ghost" data-open="gift">Buka kado</button></div>`;
 }
 document.addEventListener('click',e=>{
   const o=e.target.closest('[data-open]'); if(o) ({letter:openLetter,cake:openCake,gift:openGift,sunrise:openSunrise})[o.dataset.open]();
