@@ -4,7 +4,7 @@
 // =====================================================
 window.CONFIG = {
   herName: "Matahari",
-  signature: "— dari aku, yang selalu sayang kamu",
+  signature: "— NayNay",
 
   // Waktu ucapan muncul otomatis (00:00 WIB tanggal 11 Nov 2026)
   birthday: "2026-11-11T00:00:00+07:00",
