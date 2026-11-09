@@ -315,7 +315,7 @@ function render(){
   if(status.note){ $('noteCard').style.display=''; $('noteText').textContent=status.note; } else $('noteCard').style.display='none';
   const sc=$('surpriseCard');
   sc.innerHTML = !isBday()
-    ? `<div class="lbl">Tepat pukul 00:00</div><h2>Pantau Terus Halaman ini yaaa</h2><p>Besok Malam Hari Selasa jam 23:50 Harus ada di page ini, harus dipantau ini buatan NayNay</p>`
+    ? `<div class="lbl">Stay disini yaa</div><h2>Pantau Terus Halaman ini yaaa</h2><p>Besok Malam Hari Selasa jam 23:50 Harus ada di page ini, harus dipantau ini buatan NayNay</p>`
     : `<div class="lbl">Untukmu</div><h2>Sudah terbuka</h2><div class="btn-col"><button class="btn" data-open="letter">Surat Dari NayNay</button><button class="btn ghost" data-open="cake">Tiup lilin</button><button class="btn ghost" data-open="gift">Buka kado</button></div>`;
 }
 document.addEventListener('click',e=>{
