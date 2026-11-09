@@ -17,7 +17,7 @@
 <div id="sky"></div><div id="dawn"></div><canvas id="stars"></canvas><div class="horizon"></div>
 <div id="balloons"></div>
 <canvas id="confetti"></canvas>
-<div class="toast" id="toast"></div>
+<button id="sound" aria-label="Suara">♪</button>
 
 <!-- INTRO: matahari tenggelam -->
 <section id="intro">
@@ -42,6 +42,7 @@
 
   <div class="const" id="const">
     <svg id="constSvg" viewBox="0 0 300 300"></svg>
+    <div class="bubble" id="bubble"></div>
     <div class="const-cap" id="constCap"></div>
   </div>
 
@@ -184,20 +185,69 @@ function balloons(n=18){
     el.style.left=(Math.random()*92)+'vw'; el.style.setProperty('--w',w+'px'); el.style.setProperty('--c',BCOL[Math.random()*BCOL.length|0]);
     el.style.setProperty('--d',(9+Math.random()*7)+'s'); el.style.setProperty('--s',(2+Math.random()*2)+'s'); el.style.setProperty('--dx',(Math.random()*120-60)+'px');
     el.style.animationDelay=(Math.random()*4)+'s'; el.innerHTML='<div class="b"></div><div class="str"></div>';
-    el.addEventListener('click',()=>{ const r=el.getBoundingClientRect(); el.classList.add('pop'); vib(20); burst(r.left+r.width/2,r.top+30,24,5); setTimeout(()=>el.remove(),200); },{once:true});
+    el.addEventListener('click',()=>{ const r=el.getBoundingClientRect(); el.classList.add('pop'); vib(20); popSound(); burst(r.left+r.width/2,r.top+30,24,5); setTimeout(()=>el.remove(),200); },{once:true});
     el.addEventListener('animationend',e=>{ if(e.target===el) el.remove(); });
     box.appendChild(el);
   }
 }
 
-/* ---------- toast ---------- */
-let toastT; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),4200); }
+/* ---------- sound (music box, tanpa file) ---------- */
+const SND={ctx:null,on:store.get('sound')!=='0'};
+function audioInit(){ try{ if(!SND.ctx) SND.ctx=new (window.AudioContext||window.webkitAudioContext)(); if(SND.ctx.state==='suspended') SND.ctx.resume(); }catch(e){} }
+document.addEventListener('pointerdown',audioInit,{passive:true});
+function tone(f,at=0,dur=1.1,vol=.16){
+  const c=SND.ctx; if(!c||!SND.on) return; const t=c.currentTime+at;
+  const g=c.createGain(); g.connect(c.destination);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  [[1,1],[2,.35],[3,.12]].forEach(([m,v])=>{ const o=c.createOscillator(), og=c.createGain(); o.type='sine'; o.frequency.value=f*m; og.gain.value=v; o.connect(og); og.connect(g); o.start(t); o.stop(t+dur+.05); });
+}
+function popSound(){ const c=SND.ctx; if(!c||!SND.on) return; const n=c.sampleRate*.08, buf=c.createBuffer(1,n,c.sampleRate), d=buf.getChannelData(0);
+  for(let j=0;j<n;j++) d[j]=(Math.random()*2-1)*Math.pow(1-j/n,3);
+  const s=c.createBufferSource(), hp=c.createBiquadFilter(), g=c.createGain(); hp.type='highpass'; hp.frequency.value=900; g.gain.value=.5;
+  s.buffer=buf; s.connect(hp); hp.connect(g); g.connect(c.destination); s.start(); tone(1568,0.02,.25,.06); }
+const SCALE=[523.25,587.33,659.25,783.99,880,1046.5,1174.66,1318.51,1567.98,1760,2093];
+const sfx={
+  tap:i=>tone(SCALE[i%SCALE.length],0,1,.14),
+  lit:i=>{ [0,2,4].forEach((k,n)=>tone(SCALE[(i+k)%SCALE.length],n*.11,1.2,.15)); tone(SCALE[(i+7)%SCALE.length],.36,1.6,.1); },
+  sunset:()=>[783.99,659.25,523.25,392].forEach((f,n)=>tone(f,n*.32,1.8,.13)),
+  sparkle:()=>[0,2,4,5,7,9,10].forEach((k,n)=>tone(SCALE[k],n*.07,1,.11)),
+  candle:()=>tone(1318.51,0,.5,.07),
+  birthday:()=>{ // Happy Birthday (lagu domain publik), versi music box
+    const G4=392,A4=440,B4=493.88,C5=523.25,D5=587.33,E5=659.25,F5=698.46,G5=783.99;
+    const song=[[G4,.75],[G4,.25],[A4,1],[G4,1],[C5,1],[B4,2],[G4,.75],[G4,.25],[A4,1],[G4,1],[D5,1],[C5,2],
+      [G4,.75],[G4,.25],[G5,1],[E5,1],[C5,1],[B4,1],[A4,2],[F5,.75],[F5,.25],[E5,1],[C5,1],[D5,1],[C5,3]];
+    let t=0; const beat=.46; song.forEach(([f,b])=>{ tone(f*2,t,Math.max(1.2,b*beat*1.6),.11); tone(f,t,Math.max(1.2,b*beat*1.6),.06); t+=b*beat; });
+  }
+};
+function setSoundUI(){ $('sound').classList.toggle('off',!SND.on); }
+$('sound').onclick=e=>{ e.stopPropagation(); SND.on=!SND.on; store.set('sound',SND.on?'1':'0'); setSoundUI(); audioInit(); if(SND.on) sfx.tap(4); };
+setSoundUI();
+
+/* ---------- bubble di samping bintang ---------- */
+let bubbleT;
+function showBubble(i,mode){
+  const b=$('bubble'), r=$('constSvg').getBoundingClientRect(); if(!r.width) return;
+  const k=r.width/300, [px,py]=PTS[i], x=px*k, y=py*k, st=stateOf(i,effStep()), s=C.steps[i];
+  let small,title;
+  if(mode==='lit'){ small='Bintang ke-'+(i+1)+' menyala&nbsp;✦'; title=s.title; }
+  else if(st==='done'){ small='Momen '+pad(i+1)+' · sudah'; title=s.title; }
+  else if(st==='now'){ small='Momen '+pad(i+1)+' · sekarang'; title=s.title; }
+  else if(st==='next'){ small='Berikutnya'; title='Masih rahasia 🤫'; }
+  else { small='Momen '+pad(i+1); title='Belum waktunya'; }
+  b.innerHTML='<small>'+small+'</small><b>'+esc(title)+'</b>';
+  const right = px < 150;
+  b.className='bubble '+(right?'r':'l')+(mode==='lit'?' lit':'');
+  b.style.top=y+'px';
+  if(right){ b.style.left=(x+20)+'px'; b.style.right='auto'; } else { b.style.right=(r.width-x+20)+'px'; b.style.left='auto'; }
+  void b.offsetWidth; b.classList.add('show');
+  clearTimeout(bubbleT); bubbleT=setTimeout(()=>b.classList.remove('show'), mode==='lit'?6000:3500);
+}
 
 /* ---------- intro (sunset) ---------- */
 function showMain(){ $('intro').style.display='none'; $('main').classList.add('show'); render(); }
 let introDone=false;
 $('isun').onclick=()=>{
-  if(introDone) return; introDone=true; vib(30);
+  if(introDone) return; introDone=true; vib(30); audioInit(); setTimeout(sfx.sunset,300);
   $('intro').classList.add('set'); $('introTap').style.visibility='hidden';
   const l=$('introLine'); l.style.opacity=0;
   setTimeout(()=>{ l.textContent='Malam ini, biar aku yang menjaga kamu sampai matahari terbit lagi.'; l.style.opacity=1; },900);
@@ -226,7 +276,7 @@ function seg(a,b){ const P=HEART.pts, out=[]; if(b<a) b+=HEART.M; for(let j=a;j<
     h+=`<g class="st" data-i="${i}" transform="translate(${p[0]},${p[1]})"><circle class="glow" r="17"/><circle class="ring" r="6"/><circle class="core" r="3"/><text y="${below}">${pad(i+1)}</text><circle class="hit" r="20"/></g>`; });
   svg.innerHTML=h;
   svg.querySelectorAll('.lnk').forEach(l=>l.style.setProperty('--len',l.getTotalLength()));
-  svg.addEventListener('click',e=>{ const g=e.target.closest('.st'); if(!g) return; selected=+g.dataset.i; vib(15); renderMoment(true); renderStars(); });
+  svg.addEventListener('click',e=>{ const g=e.target.closest('.st'); if(!g) return; selected=+g.dataset.i; vib(15); sfx.tap(selected); renderMoment(true); renderStars(); showBubble(selected,'tap'); });
 })();
 
 function effStep(){ let s=status.step; if(isBday() && AUTO_IDX>=0) s=Math.max(s,AUTO_IDX+1); return Math.min(s,N); }
@@ -296,9 +346,9 @@ function applyStatus(s){
   const eff=effStep();
   if(!firstLoad && eff>prev && eff>0){
     selected=null; render();
-    toast('Bintang ke-'+eff+' menyala: '+C.steps[eff-1].title); vib([90,50,90]);
-    const g=document.querySelector(`.st[data-i="${eff-1}"]`);
-    if(g && $('main').classList.contains('show')){ const r=g.getBoundingClientRect(); burst(r.left+r.width/2,r.top+r.height/2,36,5); $('const').scrollIntoView({behavior:'smooth',block:'center'}); }
+    vib([90,50,90]); sfx.lit(eff-1);
+    if($('main').classList.contains('show')){ $('const').scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>{ const g=document.querySelector(`.st[data-i="${eff-1}"]`); if(g){ const r=g.getBoundingClientRect(); burst(r.left+r.width/2,r.top+r.height/2,36,5); } showBubble(eff-1,'lit'); },450); }
   } else render();
   firstLoad=false;
 }
@@ -318,6 +368,7 @@ function openSunrise(){
   [...$('srText').children].forEach(c=>c.classList.remove('in'));
   sr.classList.add('show'); document.body.style.overflow='hidden';
   srTimers.push(setTimeout(()=>sr.classList.add('go'),400));
+  srTimers.push(setTimeout(()=>sfx.birthday(),1800));
   [...$('srText').children].forEach((c,i)=>srTimers.push(setTimeout(()=>c.classList.add('in'),2200+i*1100)));
   srTimers.push(setTimeout(()=>{ balloons(22); burst(W/2,H*.45,70,8); },3800));
   srTimers.push(setTimeout(()=>$('srBtn').classList.add('in'),7200));
@@ -346,10 +397,10 @@ function openCake(){
   openOv('cakeOv');
 }
 $('candles').addEventListener('click',e=>{ const c=e.target.closest('.candle'); if(c) blowOut(c); });
-function blowOut(c){ if(c.classList.contains('out')) return; c.classList.add('out'); vib(30); if(!document.querySelector('.candle:not(.out)')) allOut(); }
+function blowOut(c){ if(c.classList.contains('out')) return; c.classList.add('out'); vib(30); sfx.candle(); if(!document.querySelector('.candle:not(.out)')) allOut(); }
 function blowSome(){ [...document.querySelectorAll('.candle:not(.out)')].sort(()=>Math.random()-.5).slice(0,1+(Math.random()*2|0)).forEach(blowOut); }
 function allOut(){ stopMic(); setTimeout(()=>{ $('cakeTitle').textContent='Semoga terkabul'; $('cakeSub').textContent=C.wishText; $('cakeHint').textContent=''; $('cakeBtns').style.display='none';
-  balloons(10); burst(W/2,H*.4,60,7); $('cakeAfter').classList.add('in'); store.set('cake','1'); },500); }
+  balloons(10); burst(W/2,H*.4,60,7); $('cakeAfter').classList.add('in'); store.set('cake','1'); sfx.sparkle(); },500); }
 $('micBtn').onclick=async()=>{
   if(micOn) return;
   try{
@@ -372,10 +423,10 @@ function openGift(){ taps=0; $('gift').className='gift'; $('giftCard').classList
   $('giftSub').textContent='Ketuk kadonya tiga kali.'; $('giftMsg').textContent=C.giftMessage; openOv('giftOv'); }
 $('gift').onclick=()=>{
   const g=$('gift'); if(g.classList.contains('open')) return;
-  taps++; vib(40); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
+  taps++; vib(40); tone(SCALE[taps+3],0,.6,.12); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
   if(taps<3){ $('giftSub').textContent = taps===1 ? 'Lagi…' : 'Sekali lagi'; return; }
   setTimeout(()=>{ g.classList.add('open'); $('giftSub').textContent='Selamat ulang tahun, '+C.herName;
-    const r=g.getBoundingClientRect(); burst(r.left+r.width/2,r.top+40,70,8);
+    const r=g.getBoundingClientRect(); burst(r.left+r.width/2,r.top+40,70,8); sfx.sparkle();
     setTimeout(()=>{ $('giftCard').classList.add('show'); $('giftAfter').classList.add('in'); store.set('gift','1'); },800); },450);
 };
 
