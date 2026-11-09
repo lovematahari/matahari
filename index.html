@@ -250,7 +250,7 @@ $('isun').onclick=()=>{
   if(introDone) return; introDone=true; vib(30); audioInit(); setTimeout(sfx.sunset,300);
   $('intro').classList.add('set'); $('introTap').style.visibility='hidden';
   const l=$('introLine'); l.style.opacity=0;
-  setTimeout(()=>{ l.textContent='Malam ini, biar aku yang menjaga kamu sampai matahari terbit lagi.'; l.style.opacity=1; },900);
+  setTimeout(()=>{ l.textContent='Yah Mataharinya terbenam, Tunggu sampai Mataharinya terbit lagi ya cantikk!.'; l.style.opacity=1; },900);
   setTimeout(()=>{ $('intro').style.opacity=0; },4200);
   setTimeout(()=>{ showMain(); store.set('intro','1'); },5300);
 };
