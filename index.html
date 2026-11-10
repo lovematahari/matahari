@@ -315,7 +315,7 @@ function render(){
   if(status.note){ $('noteCard').style.display=''; $('noteText').textContent=status.note; } else $('noteCard').style.display='none';
   const sc=$('surpriseCard');
   sc.innerHTML = !isBday()
-    ? `<div class="lbl">Stay disini yaa</div><h2>Pantau Terus Halaman ini yaaa</h2><p>Besok Malam Hari Selasa jam 23:50 Harus ada di page ini, harus dipantau ini buatan NayNay</p>`
+    ? `<div class="lbl">Stay disini yaa</div><h2>Pantau Terus Halaman ini yaaa</h2><p>Hari Selasa jam 23:50 Harus ada di page ini, harus dipantau ini buatan NayNay</p>`
     : `<div class="lbl">Untukmu</div><h2>Sudah terbuka</h2><div class="btn-col"><button class="btn" data-open="letter">Surat Dari NayNay</button><button class="btn ghost" data-open="cake">Tiup lilin</button><button class="btn ghost" data-open="gift">Buka kado</button></div>`;
 }
 document.addEventListener('click',e=>{
@@ -439,7 +439,7 @@ if(TEST){
   const set=s=>{ applyStatus({...status,step:Math.max(0,Math.min(N,s))}); $('tStep').textContent=status.step; };
   $('tPrev').onclick=()=>set(status.step-1); $('tNext').onclick=()=>set(status.step+1);
   $('tDriver').onclick=()=>applyStatus({...status,driver:{name:'Pak Budi',car:'Toyota Avanza Putih',plate:'B 1234 XYZ',link:''}});
-  $('tNote').onclick=()=>applyStatus({...status,note:'Aku udah nunggu kamu di sini, pelan-pelan aja ya sayang.'});
+  $('tNote').onclick=()=>applyStatus({...status,note:'i love you sukii sukii.'});
   $('tMid').onclick=()=>{ BDAY=Date.now()+5000; wasBday=false; sunriseShownThisSession=false; mem.letter=null; document.body.classList.remove('risen');
     $('cdWrap').style.display=''; $('risenBtn').style.display='none'; $('heroTitle').textContent='Matahari terbit lagi dalam'; render(); };
   BDAY=Date.now()+24*3600e3; applyStatus(status);
