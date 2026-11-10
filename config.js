@@ -48,7 +48,7 @@ window.CONFIG = {
   ],
 
   // Surat yang muncul jam 00:00
-  letterGreeting: "Hai Matahari,",
+  letterGreeting: "Hai Sukii Sukiii,",
   letter: [
     "Selamat ulang tahun cintaku. Ini tahun pertama melewati hari kelahiran kamu bareng aku. Semoga kebahagiaan selalu menyertaimu, semoga kemudahan segala cita-cita yang kamu semogakan semakin dekat dan segera terwujud.",
     "Tetaplah menjadi baik, penuh dengan cinta dan kasih sayang, tetaplah ceria. Tidak apa-apa juga sih ada sedihnya, karena itu yang bisa bikin kamu jauh lebih kuat. Di samping itu, aku juga selalu berusaha menguatkan dan berada di sebelah kamu.",
@@ -58,5 +58,5 @@ window.CONFIG = {
   letterLove: "I love you so much!<br>I love you more than you know, baby.<br>I love you, I love you!",
 
   wishText: "Semoga semua yang kamu semogakan, satu per satu terwujud.",
-  giftMessage: "Kado aslinya sudah ada di depan kamu sekarang. Tapi kado terbesarku tahun ini… ya kamu sendiri. Terima kasih sudah ada. 💗"
+  giftMessage: "Semoga suka semua sama apa yang naynay berikaannn. 💗"
 };
